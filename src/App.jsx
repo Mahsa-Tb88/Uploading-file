@@ -1,32 +1,52 @@
 import axios from "axios";
-import React, { useRef } from "react";
-
+import React, { useEffect, useState } from "react";
+// import Filelist from "./Components/FileList";
 export default function App() {
-  const inputRef = useRef();
-  function addProgressBar(file) {
-    const html = `
-<label>${file.name}</label>
-<div className="progress">
-  <div
-    className="progress-bar progress-bar-striped bg-danger"
-    role="progressbar"
-  ></div>
-</div>`;
-    const container = document.createElement("div");
-    container.className = "mb-3";
-    container.innerHTML = html;
+  const [filesUploaded, setFilesUploaded] = useState([]);
+  let selectedFiles = [];
+  function addProgressBar(file, percent) {
+    selectedFiles.push(
+      <div className="mb-3" key={file.name}>
+        <label className="m-1">{file.name}</label>
+        <div className="progress">
+          <div
+            className="progress-bar"
+            role="progressbar"
+            aria-valuenow="20"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            style="width: 0"
+          >
+            {percent}
+          </div>
+        </div>
+      </div>
+    );
   }
-  async function selectFileHandler(e) {
+  function selectFileHandler(e) {
     const files = e.target.files;
-    for (let file of files) {
-      const form = new FormData();
-      form.append("file", file);
-      const { data } = await axios.post("/", form);
-      addProgressBar(file);
+    async function uploadedFile() {
+      try {
+        for (let file of files) {
+          const form = new FormData();
+          form.append("file", file);
+          const config = {
+            onUploadProgress: (progressEvent) => {
+              const percent =
+                parseInt(progressEvent.loaded / progressEvent.total) * 100;
+              addProgressBar(file, percent);
+            },
+          };
+          const { data } = await axios.post("/", form, config);
+        }
+      } catch (e) {
+        console.log(e.message);
+      }
     }
-
-    console.log(e.target.files);
+    uploadedFile();
+    setFilesUploaded(selectedFiles);
   }
+
   return (
     <div className="text-center p-4">
       <div>
@@ -36,13 +56,14 @@ export default function App() {
           id="selector"
           className="d-none"
           onChange={(e) => selectFileHandler(e)}
-          ref={inputRef}
         />
         <label htmlFor="selector" className="btn btn-primary">
           Select File(s)
         </label>
       </div>
-      <FileList />
-     </div>
+      <div className="p-4 " id="result">
+        {filesUploaded}
+      </div>
+    </div>
   );
 }
