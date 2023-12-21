@@ -6,24 +6,6 @@ export default function App() {
  
   function selectFileHandler(e) {
     const files = e.target.files;
-    // async function uploadedFile() {
-    //   try {
-    //     for (let file of files) {
-    //       const form = new FormData();
-    //       form.append("file", file);
-    //       const config = {
-    //         onUploadProgress: (progressEvent) => {
-    //           const percent =
-    //             parseInt(progressEvent.loaded / progressEvent.total) * 100;
-    //         },
-    //       };
-    //       const { data } = await axios.post("/", form, config);
-    //     }
-    //   } catch (e) {
-    //     console.log(e.message);
-    //   }
-    // }
-    // uploadedFile();
     setFilesUploaded(files);
   }
   return (
