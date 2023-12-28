@@ -1,27 +1,17 @@
 import axios from "axios";
 import React, { useState } from "react";
 import Filelist from "./Components/FileList";
+import FileSelect from "./Components/FileSelect";
 export default function App() {
   const [filesUploaded, setFilesUploaded] = useState([]);
- 
+
   function selectFileHandler(e) {
     const files = e.target.files;
-    setFilesUploaded(files);
+    setFilesUploaded([...filesUploaded, ...files]);
   }
   return (
     <div className="text-center p-4">
-      <div>
-        <input
-          type="file"
-          multiple
-          id="selector"
-          className="d-none"
-          onChange={(e) => selectFileHandler(e)}
-        />
-        <label htmlFor="selector" className="btn btn-primary">
-          Select File(s)
-        </label>
-      </div>
+      <FileSelect selectFileHandler={selectFileHandler} />
       <div className="p-4 " id="result">
         <Filelist filesUploaded={filesUploaded} />
       </div>

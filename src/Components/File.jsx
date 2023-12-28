@@ -1,20 +1,21 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 export default function File(file) {
-  // const [percentage, setPercentage] = useState(0);
-  const [widthFile, setWidthFile] = useState(0);
-  console.log(Object.values(file)[0].name);
+  const [percent, setPercent] = useState(0);
+  const classFile = [
+    "progress-bar",
+    percent < 100 ? "progress-bar-striped progress-bar-animated" : "bg-success",
+  ].join(" ");
   useEffect(() => {
     async function uploadedFile() {
       try {
         const form = new FormData();
-        form.append("file", Object.values(file)[0]);
+        form.append("file", file);
         const config = {
           onUploadProgress: (progressEvent) => {
-            const percent =
+            const percentage =
               parseInt(progressEvent.loaded / progressEvent.total) * 100;
-            console.log(progressEvent.loaded / progressEvent.total) * 100;
-            setWidthFile(percent);
+            setPercent(percentage);
           },
         };
         const { data } = await axios.post("/", form, config);
@@ -25,15 +26,15 @@ export default function File(file) {
     uploadedFile();
   }, []);
   return (
-    <div className="mb-3" key={Object.values(file)[0].name}>
-      <label className="m-1">{Object.values(file)[0].name}</label>
+    <div className="mb-3" key={file.name}>
+      <label className="m-1">{file.name}</label>
       <div className="progress">
         <div
-          className="progress-bar progress-bar-striped progress-bar-animated "
+          className={classFile}
           role="progressbar"
-          style={{ width: widthFile + "%" }}
+          style={{ width: percent + "%" }}
         >
-          {widthFile + "%"}
+          {percent + "%"}
         </div>
       </div>
     </div>
