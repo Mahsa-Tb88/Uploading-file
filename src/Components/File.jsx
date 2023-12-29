@@ -1,33 +1,24 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-export default function File(file) {
+import uploadedFile from "../utils/uploadedFile";
+import { convertSize } from "../utils/convertSize";
+export default function File({ file }) {
   const [percent, setPercent] = useState(0);
   const classFile = [
     "progress-bar",
     percent < 100 ? "progress-bar-striped progress-bar-animated" : "bg-success",
   ].join(" ");
   useEffect(() => {
-    async function uploadedFile() {
-      try {
-        const form = new FormData();
-        form.append("file", file);
-        const config = {
-          onUploadProgress: (progressEvent) => {
-            const percentage =
-              parseInt(progressEvent.loaded / progressEvent.total) * 100;
-            setPercent(percentage);
-          },
-        };
-        const { data } = await axios.post("/", form, config);
-      } catch (e) {
-        console.log(e.message);
-      }
+    async function upload() {
+      await uploadedFile(file, setPercent);
     }
-    uploadedFile();
+    const timeOut = setTimeout(upload, 20);
+    return () => clearTimeout(timeOut);
   }, []);
   return (
-    <div className="mb-3" key={file.name}>
+    <div className="mb-3">
       <label className="m-1">{file.name}</label>
+      <span>{convertSize(file.size)}</span>
       <div className="progress">
         <div
           className={classFile}
